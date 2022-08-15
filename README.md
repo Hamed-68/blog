@@ -1,1 +1,1 @@
-# blog
+# blog by "Django REST framework"

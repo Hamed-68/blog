@@ -13,7 +13,8 @@ class Post(models.Model):
         (ARCHIVE, "Archive"),
     ]
     author = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                on_delete=models.CASCADE)
+                                on_delete=models.CASCADE,
+                                related_name='author')
     title = models.CharField(max_length=250)
     slug = models.SlugField(unique=True)
     body = models.TextField()
@@ -32,3 +33,21 @@ class Post(models.Model):
                 name='unique post title for user')
         ]
         ordering = ['-created']
+
+# ================================ COMMENT MODEL ===============================
+class Comment(models.Model):
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+                            on_delete=models.CASCADE,
+                            related_name='owner')
+    post = models.ForeignKey(Post,
+                            on_delete=models.CASCADE,
+                            related_name='comments')
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.body[:15]
+
+    class Meta:
+        ordering = ('-created',)

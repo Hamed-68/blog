@@ -1,13 +1,23 @@
 from rest_framework import serializers
-from post.models import Post
+from post.models import Post, Comment
+
+
+# ====================== COMMENT SERIALIZER ======================
+class CommentSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+    
+    class Meta:
+        model = Comment
+        fields = '__all__'
+        read_only = ['post']
 
 
 # ====================== POST SERIALIZER =======================
-class PostSerializer(serializers.HyperlinkedModelSerializer):
-    author = serializers.PrimaryKeyRelatedField(
-        read_only=True,
-        source = 'author.username',
-        default=serializers.CurrentUserDefault()
+class PostSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+    comments = CommentSerializer(
+        read_only = True,
+        many=True
     )
     class Meta:
         model = Post

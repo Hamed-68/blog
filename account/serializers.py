@@ -10,7 +10,7 @@ class UserFollowersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserFollow
-        fields = ['user_id', 'username', 'created']
+        fields = ['id', 'user_id', 'username', 'created']
 
 
 
@@ -20,15 +20,15 @@ class UserFollowingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserFollow
-        fields = ['following_user_id', 'username', 'created']
+        fields = ['id', 'following_user_id', 'username', 'created']
 
 
 
 class UserSerializer(serializers.ModelSerializer):
     """USER SERIALIZER"""
     confirm_password = serializers.CharField(write_only=True)
-    followers = UserFollowersSerializer(many=True)
-    following = UserFollowingSerializer(many=True)
+    followers = UserFollowersSerializer(many=True, read_only=True)
+    following = UserFollowingSerializer(many=True, read_only=True)
 
     class Meta:
         model = get_user_model()

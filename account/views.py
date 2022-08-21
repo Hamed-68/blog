@@ -1,5 +1,4 @@
-from account.serializers import(UserSerializer, 
-                            UserFollowersSerializer,
+from account.serializers import(UserSerializer,
                             UserFollowingSerializer)
 from account.models import UserFollow
 from rest_framework.viewsets import ModelViewSet
@@ -16,17 +15,6 @@ class UserViewset(ModelViewSet):
 
 
 
-class UserFollowersViewset(ModelViewSet):
-    """USER FOLLOWERS VIEW"""
-    queryset = UserFollow.objects.all()
-    serializer_class = UserFollowersSerializer
-
-    def perform_create(self, serializer):
-        follower = self.request.user
-        serializer.save(user_id=follower)
-
-
-
 class UserFollowingViewset(ModelViewSet):
     """USER FOLLOWING VIEW"""
     queryset = UserFollow.objects.all()
@@ -35,4 +23,3 @@ class UserFollowingViewset(ModelViewSet):
     def perform_create(self, serializer):
         follower = self.request.user
         serializer.save(user_id=follower)
-        

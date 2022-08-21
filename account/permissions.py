@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import BasePermission
 
 
 class CreateOrNeedAuthenticate(BasePermission):
@@ -9,4 +9,3 @@ class CreateOrNeedAuthenticate(BasePermission):
         elif request.method == 'PUT' or request.method == 'PATCH':
             return request.user == obj
         return True
-        

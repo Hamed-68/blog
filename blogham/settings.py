@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework', # new
     'post.apps.PostConfig', # new
     'rest_framework_simplejwt', # new
+    'account.apps.AccountConfig', # new
 ]
 
 MIDDLEWARE = [

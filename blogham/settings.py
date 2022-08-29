@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'post.apps.PostConfig', # new
     'rest_framework_simplejwt', # new
     'account.apps.AccountConfig', # new
+    'chat.apps.ChatConfig', # new
 ]
 
 MIDDLEWARE = [
@@ -136,5 +137,5 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-    ]
+    ],
 }

@@ -1,9 +1,0 @@
-.notFound {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-}
-.text {
-    color: rgb(39, 39, 160);
-}

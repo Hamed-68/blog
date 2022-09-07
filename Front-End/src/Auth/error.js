@@ -1,4 +1,4 @@
-function error(err,type) {
+function error(err, type) {
     const error = {}
     // username
     if (!err.username) {
@@ -21,8 +21,9 @@ function error(err,type) {
     }
     // confirm password
     if (type === 'signin') {
-
-        if(!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(err.email)) {
+        if (!err.email) {
+            delete error.email
+        } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(err.email)) {
             error.email = 'Email is Invalid'
         } else {
             delete error.email
@@ -41,3 +42,4 @@ function error(err,type) {
     return error
 }
 export default error
+

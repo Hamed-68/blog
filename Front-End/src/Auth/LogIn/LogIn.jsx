@@ -7,13 +7,21 @@ import { ToastContainer } from 'react-toastify';
 import notify from '../toast'
 import error from '../error'
 import { Link, useHistory } from 'react-router-dom';
+import { useLayoutEffect } from 'react';
 
 const LogIn = () => {
     const history = useHistory()
+    const token = localStorage.getItem('token')
     const [showHidePass, setShowHidePass] = useState(false)
     const [userInfo, setUserInfo] = useState({ username: '', password: '' })
     const [touch, setTouch] = useState({})
     const errors = error(userInfo, 'login');
+
+    useLayoutEffect(()=>{
+        token && history.push('/blog')
+    },[])
+
+
     const handleShowHide = () => {
         setShowHidePass(prev => !prev)
     }
@@ -33,9 +41,10 @@ const LogIn = () => {
         } else {
             const response = await postUser(userInfo)
             if (response.status) {
+                localStorage.setItem('username',response.username)
                 localStorage.setItem('token',response.token)
                 notify('success','Log In Successfully.')
-                history.push('/dashbord')
+                history.push('/blog')
             } else {
                 notify('error','username or password is wrong.')
             }

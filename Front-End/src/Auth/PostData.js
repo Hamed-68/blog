@@ -1,8 +1,6 @@
 import axios from 'axios';
 
 const postNewUser = async (info) => {
-
-
     const { username, password, confirm_password, firstname, lastname, email } = info
     const post = await axios.post('http://127.0.0.1:8000/accounts/users/',
         { username, password, confirm_password, firstname, lastname, email },
@@ -32,9 +30,9 @@ const postUser = async (info) => {
 
     if (await post) {
         if (post.request.status >= 200 && post.request.status < 300) {
-            return { status: true, token: post.data.token }
+            return { status: true, token: post.data.token, username }
         } else {
-            return { status: false, token: 'Unable to log in with provided credentials.' }
+            return { status: false, token: '' }
         }
     }
 }

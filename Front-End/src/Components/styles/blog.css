@@ -1,0 +1,28 @@
+.blog {
+    display: flex;
+    flex-direction: column;
+    border: 3px solid rgb(136, 164, 240);
+    border-radius: 8px;
+    margin-bottom: 3rem;
+  }
+  .blogAuthor {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid black;
+  }
+  .blogAuthor p {
+    margin-left: 1rem;
+    margin-bottom: 0;
+  }
+  .blogImg {
+    width: 100%;
+  }
+  .aboutBlog {
+    padding: .5rem;
+  }
+  .blogImg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  

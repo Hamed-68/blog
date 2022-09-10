@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const postNewUser = async (info) => {
     const { username, password, confirm_password, firstname, lastname, email } = info
-    const post = await axios.post('http://127.0.0.1:8000/accounts/users/',
+    const post = await axios.post('/accounts/users/',
         { username, password, confirm_password, firstname, lastname, email },
         {
             headers:
@@ -20,7 +20,7 @@ const postNewUser = async (info) => {
 }
 const postUser = async (info) => {
     const { username, password } = info
-    const post = await axios.post('http://127.0.0.1:8000/api-token-auth/',
+    const post = await axios.post('/api-token-auth/',
         { username, password },
         {
             headers:

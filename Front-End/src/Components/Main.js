@@ -1,9 +1,10 @@
 import axios from 'axios';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import './styles/main.css'
 import userlogo from './images/Ei-user.svg'
 import Blog from './Blog';
+import AddBlog from './AddBlog';
 
 const Main = () => {
     const token = localStorage.getItem('token')
@@ -12,6 +13,8 @@ const Main = () => {
 
     const [user, setUser] = useState({})
     const [posts, setPosts] = useState([])
+    const [isAdd, setIsAdd] = useState(false)
+    const [refresh, setRefresh] = useState(false)
 
     useLayoutEffect(() => {
         if (!token) history.push('/login')
@@ -19,14 +22,14 @@ const Main = () => {
 
     useEffect(() => {
         const get = async () => {
-            await axios.get('http://127.0.0.1:8000/posts/post/', { headers: { 'Authorization': `Token ${token}` } })
+            await axios.get('/posts/post/', { headers: { 'Authorization': `Token ${token}` } })
                 .then(res => setPosts(res.data.results))
 
-            await axios.get('http://127.0.0.1:8000/accounts/users/')
+            await axios.get('/accounts/users/')
                 .then((res) => handleUser(res))
         }
         get()
-    }, [])
+    }, [refresh,token])
     const handleUser = (res) => {
         const user = res.data.results.find(u => u.username.includes(username))
         setUser(user)
@@ -39,7 +42,7 @@ const Main = () => {
                 author={i.author}
                 img={i.picture}
                 title={i.title}
-                desc={i.body} 
+                desc={i.body}
                 date={i.created} />
         )
     }) : <h3> thire is no Blogs.</h3>
@@ -48,10 +51,27 @@ const Main = () => {
         localStorage.removeItem('token')
         history.push('/login')
     }
+    const handleData = async (data) => {
+        await axios.post('/posts/post/', {
+            "title": data.title,
+            "body": data.body,
+            "picture": data.picture,
+            "status": data.status
+        },
+            {
+                headers:
+                {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Token ${token}`
+                }
+            })
+            .then(() => setRefresh(!refresh))
+    }
     return (
         <>
             <div className='main'>
                 <div className='container'>
+                    {isAdd && <AddBlog handleCloseModal={() => setIsAdd(false)} handleData={handleData} />}
                     <header className='header'>
                         <div className='user d-flex align-items-center'>
                             <div className='userImg'>
@@ -66,7 +86,7 @@ const Main = () => {
                         <h1 className='title'>Blogs</h1>
                         <div className='manageBlog'>
                             <button className='myBlog'>My Blog</button>
-                            <button className='addBlog'>Add Blog</button>
+                            <button className='addBlog' onClick={() => setIsAdd(true)}>Add Blog</button>
                         </div>
                     </header>
                     <main className='blogs d-flex flex-column'>

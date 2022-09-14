@@ -21,7 +21,10 @@ class PostSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = [
+            'id', 'author', 'title', 'slug', 'body',
+            'picture', 'created', 'updated', 'status', 'comments'
+        ]
         read_only_fields = ['slug']
         lookup_field = 'slug'
         extra_kwargs = {

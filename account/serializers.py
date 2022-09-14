@@ -16,11 +16,17 @@ class UserFollowersSerializer(serializers.ModelSerializer):
 
 class UserFollowingSerializer(serializers.ModelSerializer):
     """USER FOLLOWING SERIALIZER"""
-    username = serializers.ReadOnlyField(source='following_user_id.username')
+    following_user_id = serializers.SlugRelatedField(
+        slug_field='username',
+        queryset=get_user_model().objects.all(),
+        many=False
+    )
+    user = serializers.ReadOnlyField(source='user_id.username')
+
 
     class Meta:
         model = UserFollow
-        fields = ['id', 'following_user_id', 'username', 'created']
+        fields = ['id', 'user', 'following_user_id', 'created']
 
 
 

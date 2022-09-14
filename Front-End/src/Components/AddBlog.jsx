@@ -35,10 +35,11 @@ const AddBlog = ({ handleCloseModal, handleData }) => {
     }
     return (
         <div className='wXFr'>
-            <button className='closeModal' onClick={handleCloseModal}>close</button>
             <div className="tab-pane" id="post-object-form">
                 <form method='POST' encType='multipart/form-data' className="form-horizontal">
+
                     <fieldset>
+
                         <div className="form-group ">
                             <label className="control-label">Title</label>
                             <input name="title" className="form-control" type="text" value={addPost.title} onChange={handleChange} />
@@ -62,6 +63,7 @@ const AddBlog = ({ handleCloseModal, handleData }) => {
                         </div>
                         <div className="form-actions">
                             <button type='submit' className="js-tooltip" onClick={handleSendData}>POST</button>
+                            <button className='closeModal' onClick={handleCloseModal}>CANCLE</button>
                         </div>
                     </fieldset>
                 </form>

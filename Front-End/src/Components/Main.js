@@ -11,7 +11,7 @@ const Main = () => {
     const username = localStorage.getItem('username')
     const history = useHistory()
 
-    const [user, setUser] = useState({})
+    const [user, setUser] = useState('')
     const [posts, setPosts] = useState([])
     const [isAdd, setIsAdd] = useState(false)
     const [refresh, setRefresh] = useState(false)
@@ -29,23 +29,25 @@ const Main = () => {
                 .then((res) => handleUser(res))
         }
         get()
-    }, [refresh,token])
+    }, [refresh, token])
     const handleUser = (res) => {
         const user = res.data.results.find(u => u.username.includes(username))
         setUser(user)
     }
 
-    const Blogs = posts ? posts.map(i => {
+    const Blogs = posts && user && posts.map(i => {
         return (
             <Blog
                 key={i.id}
                 author={i.author}
+                username={user.username}
+                users={user}
                 img={i.picture}
                 title={i.title}
                 desc={i.body}
                 date={i.created} />
         )
-    }) : <h3> thire is no Blogs.</h3>
+    })
 
     const handleLogout = () => {
         localStorage.removeItem('token')
@@ -78,14 +80,14 @@ const Main = () => {
                                 <img src={userlogo} alt='user' width='100px' />
                             </div>
                             <div className='userInfo'>
-                                <h4>{user.username}</h4>
+                                <Link to='/dashbord'>{user.username}</Link>
                                 <h6>{user.email}</h6>
                                 <span onClick={handleLogout}>Log out</span>
                             </div>
                         </div>
                         <h1 className='title'>Blogs</h1>
                         <div className='manageBlog'>
-                            <button className='myBlog'>My Blog</button>
+                            <button className='myBlog' onClick={() => history.push('/dashbord')}>My Blog</button >
                             <button className='addBlog' onClick={() => setIsAdd(true)}>Add Blog</button>
                         </div>
                     </header>

@@ -1,0 +1,74 @@
+.prVk {
+  border: 3px solid rgb(68, 146, 192);
+}
+.gCte {
+  flex-direction: column;
+  height: auto;
+  align-items: center;
+}
+.gCte h3 {
+  font-size: 1.3rem;
+}
+.nmU {
+  width: 110px;
+}
+.nmU img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+.mUyf {
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+.mgVj {
+  cursor: pointer;
+  text-decoration: none;
+  color: #000;
+  font-size: 18px;
+  letter-spacing: 1px;
+  font-weight: 500;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 2rem;
+}
+.mgVj:hover {
+  color: #000;
+}
+.gBqr {
+  padding: 0.8rem;
+}
+.gBqr ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+.gBqr li {
+  margin: 0.5rem 0;
+  font-size: 17px;
+}
+.gBqr span {
+  font-weight: 600;
+  font-size: 18px;
+}
+.bOOb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem auto;
+}
+.bOOb button {
+    font-size: 17px;
+    border: none;
+    background: rgba(101, 140, 223, 0.678);
+    outline: none;
+    margin:  0 1rem;
+    padding: .3rem 1rem;
+    border-radius: 10px;
+}

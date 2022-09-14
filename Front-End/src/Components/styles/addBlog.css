@@ -21,18 +21,14 @@
 }
 .closeModal {
   border: none;
-  background: none;
-  color: #fff;
-  font-size: 2rem;
-  position: fixed;
-  top: 25%;
-  left: 33%;
+  margin: 0.5rem 1rem;
+  padding: 0.2rem 1rem;
 }
 .form-actions {
-    text-align: center;
+  text-align: center;
 }
 .js-tooltip {
-    border: none;
-    margin: .5rem 1rem;
-    padding: .2rem 1rem;
+  border: none;
+  margin: 0.5rem 1rem;
+  padding: 0.2rem 1rem;
 }

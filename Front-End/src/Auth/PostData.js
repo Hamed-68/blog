@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 const postNewUser = async (info) => {
-    const { username, password, confirm_password, firstname, lastname, email } = info
+    const { username, password, confirm_password, first_name, last_name, email } = info
     const post = await axios.post('/accounts/users/',
-        { username, password, confirm_password, firstname, lastname, email },
+        { username, password, confirm_password, first_name, last_name, email },
         {
             headers:
                 { 'Content-Type': 'application/json' }

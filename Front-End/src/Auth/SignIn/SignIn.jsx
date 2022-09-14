@@ -13,7 +13,7 @@ const SignIn = () => {
     const history = useHistory();
     const [showHidePass, setShowHidePass] = useState(false)
     const [showHideCpass, setShowHideCpass] = useState(false)
-    const [userInfo, setUserInfo] = useState({ username: '', firstname: '', lastname: '', email: '', password: '', confirm_password: '' })
+    const [userInfo, setUserInfo] = useState({ username: '', first_name: '', last_name: '', email: '', password: '', confirm_password: '' })
     const [touch, setTouch] = useState({})
     const errors = error(userInfo, 'signin')
 
@@ -72,14 +72,14 @@ const SignIn = () => {
                         <input
                             className={styles.input}
                             type="text"
-                            name='firstname' id='firstname' onChange={handleChange} value={userInfo.firstname} />
+                            name='first_name' id='firstname' onChange={handleChange} value={userInfo.first_name} />
                         <label htmlFor="firstname">First Name :</label>
                     </div>
                     <div className={styles.formInput}>
                         <input
                             className={styles.input}
                             type="text"
-                            name='lastname' id='lastname' onChange={handleChange} value={userInfo.lastname} />
+                            name='last_name' id='lastname' onChange={handleChange} value={userInfo.last_name} />
                         <label htmlFor="lastname">Last Name :</label>
                     </div>
                     <div className={styles.formInput}>

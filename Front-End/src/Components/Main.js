@@ -41,7 +41,6 @@ const Main = () => {
                 key={i.id}
                 author={i.author}
                 username={user.username}
-                users={user}
                 img={i.picture}
                 title={i.title}
                 desc={i.body}
@@ -80,7 +79,7 @@ const Main = () => {
                                 <img src={userlogo} alt='user' width='100px' />
                             </div>
                             <div className='userInfo'>
-                                <Link to='/dashbord'>{user.username}</Link>
+                                <Link to={`/users/${user.username}`}>{user.username}</Link>
                                 <h6>{user.email}</h6>
                                 <span onClick={handleLogout}>Log out</span>
                             </div>

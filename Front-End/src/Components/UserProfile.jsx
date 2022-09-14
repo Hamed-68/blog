@@ -39,9 +39,6 @@ const UserProfile = (props) => {
         }
 
         get()
-
-
-
         if (myUsername == userName) {
             setMe(true)
         } else {
@@ -70,7 +67,6 @@ const UserProfile = (props) => {
         const userN = users.find(u => u.username.includes(userName))
         if (userN) setUser(userN)
         else history.push('/usernotfound')
-
     }
 
     const handleFindPost = (posts) => {
@@ -93,13 +89,12 @@ const UserProfile = (props) => {
 
     const handleFollow = async () => {
         if (isFollow) {
-
             await axios.delete(`/accounts/following/${isFollow.id}`)
             .then(()=>setRefresh(!refresh))
 
         } else {
             await axios.post('/accounts/following/',
-                { "following_user_id": user.id },
+                { "following_user_id": user.username },
                 {
                     headers:
                     {

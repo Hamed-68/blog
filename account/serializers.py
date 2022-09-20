@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from account.models import UserFollow
+from post.serializers import PostSerializer
 
 
 
@@ -36,13 +37,15 @@ class UserFollowingSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     """USER SERIALIZER"""
     confirm_password = serializers.CharField(write_only=True)
+    post_set = PostSerializer(many=True, read_only=True)
     followers = UserFollowersSerializer(many=True, read_only=True)
     following = UserFollowingSerializer(many=True, read_only=True)
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'first_name', 'last_name', 'email',
-                 'followers', 'following', 'password', 'confirm_password']
+        fields = ['id', 'username', 'first_name', 'last_name',
+                  'email', 'post_set', 'followers', 'following',
+                  'password', 'confirm_password']
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate(self, attrs):

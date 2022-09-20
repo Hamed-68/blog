@@ -13,8 +13,7 @@ class Post(models.Model):
         (ARCHIVE, "Archive"),
     ]
     author = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                on_delete=models.CASCADE,
-                                related_name='author')
+                                on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
     slug = models.SlugField(unique=True)
     body = models.TextField()

@@ -46,7 +46,11 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'first_name', 'last_name',
                   'email', 'post_set', 'followers', 'following',
                   'password', 'confirm_password']
-        extra_kwargs = {'password': {'write_only': True}}
+        lookup_field = 'username'
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'url': {'lookup_field': lookup_field}
+        }
 
     def validate(self, attrs):
         if attrs['password'] != attrs['confirm_password']:

@@ -13,6 +13,7 @@ class UserViewset(ModelViewSet):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
     permission_classes = [CreateOrNeedAuthenticate]
+    lookup_field = 'username'
 
 
 

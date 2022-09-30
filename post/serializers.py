@@ -26,7 +26,3 @@ class PostSerializer(serializers.ModelSerializer):
             'picture', 'created', 'updated', 'status', 'comments'
         ]
         read_only_fields = ['slug']
-        lookup_field = 'slug'
-        extra_kwargs = {
-            'url': {'lookup_field': 'slug'}
-        }

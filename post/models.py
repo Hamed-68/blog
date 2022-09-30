@@ -15,7 +15,7 @@ class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(allow_unicode=True)
     body = models.TextField()
     picture = models.ImageField(blank=True, null=True, upload_to="post_pics")
     created = models.DateTimeField(auto_now_add=True)

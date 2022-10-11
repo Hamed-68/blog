@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'chat.apps.ChatConfig', # new
     'rest_framework.authtoken', # new
     'corsheaders', # new
+    'django_cleanup.apps.CleanupConfig', # new
 ]
 
 MIDDLEWARE = [

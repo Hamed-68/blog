@@ -2,8 +2,9 @@ from django.db import models
 from django.conf import settings
 
 
-# ================================ POST MODEL ===============================
+
 class Post(models.Model):
+    """ POST MODEL """
     PUBLISH = "PU"
     DRAFT = "DR"
     ARCHIVE = "AR"
@@ -17,10 +18,9 @@ class Post(models.Model):
     title = models.CharField(max_length=250)
     slug = models.SlugField(allow_unicode=True)
     body = models.TextField()
-    picture = models.ImageField(blank=True, null=True, upload_to="post_pics")
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    status = models.CharField(max_length=2, choices=PUBLISH_CHOICES, default=DRAFT)
+    status = models.CharField(max_length=2, choices=PUBLISH_CHOICES, default=PUBLISH)
 
     def __str__(self):
         return self.title
@@ -33,8 +33,26 @@ class Post(models.Model):
         ]
         ordering = ['-created']
 
-# ================================ COMMENT MODEL ===============================
+
+
+class Images(models.Model):
+    """
+    IMAGES CLASS.
+    by this model, posts could have multi images.
+    """
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='images')
+    image = models.FileField(upload_to='post_medias',
+                              null=True)
+    def __str__(self):
+        return f'{self.post.title} images'
+
+
+
 class Comment(models.Model):
+    """ COMMENT MODEL """
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,
                             on_delete=models.CASCADE,
                             related_name='owner')

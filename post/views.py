@@ -7,8 +7,9 @@ from post.permissions import IsAuthorOrReadonly, IsOwnerOrAuthorPost
 from django.shortcuts import get_object_or_404
 
 
-# =========================== POST VIEW ===============================
+
 class PostView(viewsets.ModelViewSet):
+    """ POST VIEW """
     queryset = Post.objects.filter(status='PU')
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated, IsAuthorOrReadonly]
@@ -29,13 +30,10 @@ class PostView(viewsets.ModelViewSet):
         auto_slug = slugify(serializer.validated_data['title'], allow_unicode=True)
         serializer.save(slug=auto_slug, author=self.request.user)
 
-    def perform_destroy(self, instance):
-        if instance.picture and instance.picture.url:
-            instance.picture.delete()   # delete picture from database
-        return super().perform_destroy(instance)
 
-# ======================== COMMENT VIEW ===============================
+
 class CommentView(viewsets.ModelViewSet):
+    """ COMMENT VIEW """
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrAuthorPost]

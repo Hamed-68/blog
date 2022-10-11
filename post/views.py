@@ -12,14 +12,14 @@ class PostView(viewsets.ModelViewSet):
     """ POST VIEW """
     queryset = Post.objects.filter(status='PU')
     serializer_class = PostSerializer
-    permission_classes = [IsAuthenticated, IsAuthorOrReadonly]
+    permission_classes = [IsAuthorOrReadonly]
     lookup_fields = ['pk', 'slug']
 
     def get_object(self):
         queryset = self.get_queryset()             # Get the base queryset
         queryset = self.filter_queryset(queryset)  # Apply any filter backends
         filter = {}
-        for field in self.lookup_fields[:1]:  # just use first arg(id)
+        for field in self.lookup_fields:  # just use first arg(id)
             if self.kwargs.get(field): # Ignore empty fields.
                 filter[field] = self.kwargs[field]
         obj = get_object_or_404(queryset, **filter)  # Lookup the object
@@ -36,7 +36,7 @@ class CommentView(viewsets.ModelViewSet):
     """ COMMENT VIEW """
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrAuthorPost]
+    permission_classes = [IsOwnerOrAuthorPost]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

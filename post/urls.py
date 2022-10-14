@@ -5,6 +5,7 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r'post', views.PostView, basename='post')
+router.register(r'explore', views.ExplorePost, basename='explore')
 router.register(r'comment', views.CommentView, basename='comment')
 
 
@@ -17,5 +18,13 @@ urlpatterns = [
                 'delete': 'destroy'
             }),
         name='post-detail'),
+    re_path(
+        r'explore/(?P<pk>[\d]+)/(?P<slug>[-\w]+)/',
+        views.ExplorePost.as_view({'get': 'retrieve',
+                'put': 'update',
+                'patch': 'partial_update',
+                'delete': 'destroy'
+            }),
+        name='explore-detail'),
     path('', include(router.urls)),
 ]

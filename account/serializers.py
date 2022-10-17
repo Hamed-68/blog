@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from account.models import UserFollow
-from post.serializers import PostSerializer
+from post.serializers import PostWithoutSerializer
 from django.core.paginator import Paginator
 
 
@@ -58,7 +58,7 @@ class UserSerializer(serializers.ModelSerializer):
         paginate = Paginator(obj.post_set.all(), limit)
         offset = self.context['request'].query_params.get('offset') or 1
         posts = paginate.page(offset)
-        serializer = PostSerializer(posts, many=True)
+        serializer = PostWithoutSerializer(posts, many=True)
         return serializer.data
 
     def paginated_following(self, obj):     # paginate users following

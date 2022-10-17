@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from post.models import Post, Comment, Images
+from django.core.paginator import Paginator
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -21,7 +22,7 @@ class ImagesSerializer(serializers.ModelSerializer):
 
 
 
-class PostSerializer(serializers.ModelSerializer):
+class PostWithoutSerializer(serializers.ModelSerializer):
     """ POST SERIALIZER """
     author = serializers.ReadOnlyField(source='author.username')
     images = ImagesSerializer(many=True, read_only=True)
@@ -30,15 +31,11 @@ class PostSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
-    comments = CommentSerializer(
-        read_only = True,
-        many=True
-    )
     class Meta:
         model = Post
         fields = [
             'id', 'author', 'title', 'slug', 'body','images',
-            'uplouded_images', 'created', 'updated', 'status', 'comments'
+            'uplouded_images', 'created', 'updated', 'status'
         ]
         read_only_fields = ['slug']
 
@@ -65,3 +62,27 @@ class PostSerializer(serializers.ModelSerializer):
             for img in images:
                 Images.objects.create(post=instance, image=img)
         return instance
+
+
+
+class PostSerializer(PostWithoutSerializer):
+    """
+    THIS SERIALIZER HAS COMMENTS AS NESTED SERIALIZER.
+    """
+    comments = serializers.SerializerMethodField('paginated_comments')
+
+    class Meta:
+        model = Post
+        fields = [
+            'id', 'author', 'title', 'slug', 'body','images',
+            'uplouded_images', 'created', 'updated', 'status', 'comments'
+        ]
+        read_only_fields = ['slug']
+    
+    def paginated_comments(self, obj):     # paginate posts comments
+        limit = self.context['request'].query_params.get('limit') or 2
+        paginate = Paginator(obj.comments.all(), limit)
+        offset = self.context['request'].query_params.get('offset') or 1
+        comments = paginate.page(offset)
+        serializer = CommentSerializer(comments, many=True)
+        return serializer.data

@@ -46,9 +46,11 @@ class ExplorePost(PostView):
     """
     def get_queryset(self):
         user = self.request.user
-        posts = Post.objects.exclude(
-            Q(author__followers__user_id=user.id) | Q(author=user))
-        return posts.filter(status='PU')
+        if user.is_authenticated:
+            posts = Post.objects.exclude(
+                Q(author__followers__user_id=user.id) | Q(author=user))
+            return posts.filter(status='PU')
+        return Post.objects.all()
 
 
 

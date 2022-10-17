@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from account.models import UserFollow
 from post.serializers import PostSerializer
+from django.core.paginator import Paginator
 
 
 
@@ -37,9 +38,9 @@ class UserFollowingSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     """USER SERIALIZER"""
     confirm_password = serializers.CharField(write_only=True)
-    post_set = PostSerializer(many=True, read_only=True)
-    followers = UserFollowersSerializer(many=True, read_only=True)
-    following = UserFollowingSerializer(many=True, read_only=True)
+    post_set = serializers.SerializerMethodField('paginated_posts')
+    following = serializers.SerializerMethodField('paginated_following')
+    followers = serializers.SerializerMethodField('paginated_followers')
 
     class Meta:
         model = get_user_model()
@@ -51,6 +52,30 @@ class UserSerializer(serializers.ModelSerializer):
             'password': {'write_only': True},
             'url': {'lookup_field': lookup_field}
         }
+
+    def paginated_posts(self, obj):     # paginate users posts
+        limit = self.context['request'].query_params.get('limit') or 1
+        paginate = Paginator(obj.post_set.all(), limit)
+        offset = self.context['request'].query_params.get('offset') or 1
+        posts = paginate.page(offset)
+        serializer = PostSerializer(posts, many=True)
+        return serializer.data
+
+    def paginated_following(self, obj):     # paginate users following
+        limit = self.context['request'].query_params.get('limit') or 1
+        paginate = Paginator(obj.following.all(), limit)
+        offset = self.context['request'].query_params.get('offset') or 1
+        following = paginate.page(offset)
+        serializer = UserFollowingSerializer(following, many=True)
+        return serializer.data
+
+    def paginated_followers(self, obj):     # paginate users followers
+        limit = self.context['request'].query_params.get('limit') or 1
+        paginate = Paginator(obj.followers.all(), limit)
+        offset = self.context['request'].query_params.get('offset') or 1
+        followers = paginate.page(offset)
+        serializer = UserFollowingSerializer(followers, many=True)
+        return serializer.data
 
     def validate(self, attrs):
         if attrs['password'] != attrs['confirm_password']:

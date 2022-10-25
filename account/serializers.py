@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from account.models import UserFollow
+from account.models import UserFollow, Profile
 from post.serializers import PostWithoutSerializer
 from django.core.paginator import Paginator
 
@@ -35,9 +35,20 @@ class UserFollowingSerializer(serializers.ModelSerializer):
 
 
 
+class ProfileSerializer(serializers.ModelSerializer):
+    """
+    PROFILESERIALIZER FOR USER 
+    """
+    class Meta:
+        model = Profile
+        fields = ['photo',]
+
+
+
 class UserSerializer(serializers.ModelSerializer):
     """USER SERIALIZER"""
     confirm_password = serializers.CharField(write_only=True)
+    profile = ProfileSerializer()
     post_set = serializers.SerializerMethodField('paginated_posts')
     following = serializers.SerializerMethodField('paginated_following')
     followers = serializers.SerializerMethodField('paginated_followers')
@@ -45,7 +56,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['id', 'username', 'first_name', 'last_name',
-                  'email', 'post_set', 'followers', 'following',
+                  'email', 'profile', 'post_set', 'followers', 'following',
                   'password', 'confirm_password']
         lookup_field = 'username'
         extra_kwargs = {
@@ -85,11 +96,21 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('confirm_password')
+        profile = validated_data.pop('profile')
         user = get_user_model().objects.create_user(**validated_data)
+        if profile['photo']:
+            Profile.objects.create(user=user, photo=profile['photo'])
+        else:
+            Profile.objects.create(user=user, photo=None)
         return user
 
     def update(self, instance, validated_data):
+        profile = validated_data.pop('profile')
         if 'password' in validated_data:
             password = validated_data.pop('password')
             instance.set_password(password)
+        if profile['photo']:
+            instance.profile.delete()
+            Profile.objects.create(user=instance, photo=profile['photo'])
+        instance.save()
         return super(UserSerializer, self).update(instance, validated_data)

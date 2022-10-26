@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from account.models import UserFollow, Profile
-from post.serializers import PostWithoutSerializer
+from post.serializers import PostWithoutCommentsSerializer
 from django.core.paginator import Paginator
 
 
@@ -37,11 +37,23 @@ class UserFollowingSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     """
-    PROFILESERIALIZER FOR USER 
+    PROFILE SERIALIZER FOR USER 
     """
     class Meta:
         model = Profile
         fields = ['photo',]
+
+
+
+class RawUserSerializer(serializers.ModelSerializer):
+    """ USER SERIALIZER WITHOUT NESTED SERIALIZERS. """
+    profile = ProfileSerializer()
+
+    class Meta:
+        model = get_user_model()
+        fields = ['id', 'username', 'first_name',
+                  'last_name', 'email', 'profile']
+        lookup_field = 'username'
 
 
 
@@ -65,26 +77,35 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def paginated_posts(self, obj):     # paginate users posts
-        limit = self.context['request'].query_params.get('limit') or 1
-        paginate = Paginator(obj.post_set.all(), limit)
-        offset = self.context['request'].query_params.get('offset') or 1
-        posts = paginate.page(offset)
-        serializer = PostWithoutSerializer(posts, many=True)
+        size = self.context['request'].query_params.get('size') or 5
+        page = self.context['request'].query_params.get('page') or 1
+        paginate = Paginator(obj.post_set.all(), size)
+        try:
+            posts = paginate.page(page)
+        except:
+            posts = paginate.page(1)
+        serializer = PostWithoutCommentsSerializer(posts, many=True)
         return serializer.data
 
     def paginated_following(self, obj):     # paginate users following
-        limit = self.context['request'].query_params.get('limit') or 1
-        paginate = Paginator(obj.following.all(), limit)
-        offset = self.context['request'].query_params.get('offset') or 1
-        following = paginate.page(offset)
+        following_size = self.context['request'].query_params.get('following_size') or 5
+        following_page = self.context['request'].query_params.get('following_page') or 1
+        paginate = Paginator(obj.following.all(), following_size)
+        try:
+            following = paginate.page(following_page)
+        except:
+            following = paginate.page(1)
         serializer = UserFollowingSerializer(following, many=True)
         return serializer.data
 
     def paginated_followers(self, obj):     # paginate users followers
-        limit = self.context['request'].query_params.get('limit') or 1
-        paginate = Paginator(obj.followers.all(), limit)
-        offset = self.context['request'].query_params.get('offset') or 1
-        followers = paginate.page(offset)
+        follower_size = self.context['request'].query_params.get('follower_size') or 5
+        follower_page = self.context['request'].query_params.get('follower_page') or 1
+        paginate = Paginator(obj.followers.all(), follower_size)
+        try:
+            followers = paginate.page(follower_page)
+        except:
+            followers = paginate.page(1)
         serializer = UserFollowingSerializer(followers, many=True)
         return serializer.data
 
@@ -98,7 +119,7 @@ class UserSerializer(serializers.ModelSerializer):
         validated_data.pop('confirm_password')
         profile = validated_data.pop('profile')
         user = get_user_model().objects.create_user(**validated_data)
-        if profile['photo']:
+        if profile['photo']:  # add profile photo
             Profile.objects.create(user=user, photo=profile['photo'])
         else:
             Profile.objects.create(user=user, photo=None)
@@ -109,7 +130,7 @@ class UserSerializer(serializers.ModelSerializer):
         if 'password' in validated_data:
             password = validated_data.pop('password')
             instance.set_password(password)
-        if profile['photo']:
+        if profile['photo']:  # change profile photo
             instance.profile.delete()
             Profile.objects.create(user=instance, photo=profile['photo'])
         instance.save()

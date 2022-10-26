@@ -22,8 +22,8 @@ class ImagesSerializer(serializers.ModelSerializer):
 
 
 
-class PostWithoutSerializer(serializers.ModelSerializer):
-    """ POST SERIALIZER """
+class PostWithoutCommentsSerializer(serializers.ModelSerializer):
+    """ POST SERIALIZER WITHOUT COMMENTS."""
     author = serializers.ReadOnlyField(source='author.username')
     images = ImagesSerializer(many=True, read_only=True)
     uplouded_images = serializers.ListField(
@@ -65,7 +65,7 @@ class PostWithoutSerializer(serializers.ModelSerializer):
 
 
 
-class PostSerializer(PostWithoutSerializer):
+class PostSerializer(PostWithoutCommentsSerializer):
     """
     THIS SERIALIZER HAS COMMENTS AS NESTED SERIALIZER.
     """
@@ -80,9 +80,12 @@ class PostSerializer(PostWithoutSerializer):
         read_only_fields = ['slug']
     
     def paginated_comments(self, obj):     # paginate posts comments
-        limit = self.context['request'].query_params.get('limit') or 2
-        paginate = Paginator(obj.comments.all(), limit)
-        offset = self.context['request'].query_params.get('offset') or 1
-        comments = paginate.page(offset)
+        size = self.context['request'].query_params.get('size') or 5
+        page = self.context['request'].query_params.get('page') or 0
+        paginate = Paginator(obj.comments.all(), size)
+        try:
+            comments = paginate.page(page)
+        except:
+            comments = paginate.page(1)
         serializer = CommentSerializer(comments, many=True)
         return serializer.data

@@ -1,8 +1,10 @@
-from post.serializers import PostSerializer, CommentSerializer
+from post.serializers import (
+    PostSerializer,
+    CommentSerializer,
+    PostWithoutCommentsSerializer)
 from rest_framework import viewsets
 from post.models import Post, Comment
 from django.utils.text import slugify
-from rest_framework.permissions import IsAuthenticated
 from post.permissions import IsAuthorOrReadonly, IsOwnerOrAuthorPost
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
@@ -16,6 +18,11 @@ class PostView(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = [IsAuthorOrReadonly]
     lookup_fields = ['pk', 'slug']
+
+    def get_serializer_class(self):  # show comments just in post detail
+        if hasattr(self, 'action') and self.action == 'list':
+            return PostWithoutCommentsSerializer
+        return self.serializer_class
 
     def get_queryset(self):
         user = self.request.user

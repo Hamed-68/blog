@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from account.models import UserFollow, Profile
 from post.serializers import PostWithoutCommentsSerializer
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
 
@@ -82,9 +82,11 @@ class UserSerializer(serializers.ModelSerializer):
         paginate = Paginator(obj.post_set.all(), size)
         try:
             posts = paginate.page(page)
-        except:
+        except PageNotAnInteger:
             posts = paginate.page(1)
-        serializer = PostWithoutCommentsSerializer(posts, many=True)
+        except EmptyPage:
+            posts = None
+        serializer = PostWithoutCommentsSerializer(posts, many=True, context=self.context)
         return serializer.data
 
     def paginated_following(self, obj):     # paginate users following
@@ -93,8 +95,10 @@ class UserSerializer(serializers.ModelSerializer):
         paginate = Paginator(obj.following.all(), following_size)
         try:
             following = paginate.page(following_page)
-        except:
+        except PageNotAnInteger:
             following = paginate.page(1)
+        except EmptyPage:
+            following = None
         serializer = UserFollowingSerializer(following, many=True)
         return serializer.data
 
@@ -104,8 +108,10 @@ class UserSerializer(serializers.ModelSerializer):
         paginate = Paginator(obj.followers.all(), follower_size)
         try:
             followers = paginate.page(follower_page)
-        except:
+        except PageNotAnInteger:
             followers = paginate.page(1)
+        except EmptyPage:
+            followers = None
         serializer = UserFollowingSerializer(followers, many=True)
         return serializer.data
 

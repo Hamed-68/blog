@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from post.models import Post, Comment, Images
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -81,11 +81,13 @@ class PostSerializer(PostWithoutCommentsSerializer):
     
     def paginated_comments(self, obj):     # paginate posts comments
         size = self.context['request'].query_params.get('size') or 5
-        page = self.context['request'].query_params.get('page') or 0
+        page = self.context['request'].query_params.get('page') or 1
         paginate = Paginator(obj.comments.all(), size)
         try:
             comments = paginate.page(page)
-        except:
+        except PageNotAnInteger:
             comments = paginate.page(1)
+        except EmptyPage:
+            comments = None
         serializer = CommentSerializer(comments, many=True)
         return serializer.data

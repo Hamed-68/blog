@@ -1,5 +1,4 @@
 from post.serializers import (
-    PostSerializer,
     CommentSerializer,
     PostWithoutCommentsSerializer)
 from rest_framework import viewsets
@@ -8,6 +7,8 @@ from django.utils.text import slugify
 from post.permissions import IsAuthorOrReadonly, IsOwnerOrAuthorPost
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 
 
@@ -15,14 +16,9 @@ class PostView(viewsets.ModelViewSet):
     """ 
     POST VIEW, DISPLAYS USER POSTS AND FOLLOWINGS.
     """
-    serializer_class = PostSerializer
+    serializer_class = PostWithoutCommentsSerializer
     permission_classes = [IsAuthorOrReadonly]
     lookup_fields = ['pk', 'slug']
-
-    def get_serializer_class(self):  # show comments just in post detail
-        if hasattr(self, 'action') and self.action == 'list':
-            return PostWithoutCommentsSerializer
-        return self.serializer_class
 
     def get_queryset(self):
         user = self.request.user
@@ -66,6 +62,16 @@ class CommentView(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsOwnerOrAuthorPost]
+
+    @action(detail=True, methods=['get'])
+    def post_id(self, request, pk):
+        comments = Comment.objects.filter(post=pk).order_by('-created')
+        page = self.paginate_queryset(comments)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(comments, many=True)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

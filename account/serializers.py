@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from account.models import UserFollow, Profile
-from post.serializers import PostWithoutCommentsSerializer
+from post.serializers import PostSerializer
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
@@ -61,20 +61,26 @@ class UserSerializer(serializers.ModelSerializer):
     """USER SERIALIZER"""
     confirm_password = serializers.CharField(write_only=True)
     profile = ProfileSerializer()
+    followers = serializers.SerializerMethodField('count_followers')
+    following = serializers.SerializerMethodField('count_following')
     post_set = serializers.SerializerMethodField('paginated_posts')
-    following = serializers.SerializerMethodField('paginated_following')
-    followers = serializers.SerializerMethodField('paginated_followers')
 
     class Meta:
         model = get_user_model()
         fields = ['id', 'username', 'first_name', 'last_name',
-                  'email', 'profile', 'post_set', 'followers', 'following',
-                  'password', 'confirm_password']
+                  'email', 'profile', 'followers', 'following',
+                  'post_set','password', 'confirm_password']
         lookup_field = 'username'
         extra_kwargs = {
             'password': {'write_only': True},
             'url': {'lookup_field': lookup_field}
         }
+    
+    def count_followers(self, obj):
+        return obj.followers.count()
+
+    def count_following(self, obj):
+        return obj.following.count()
 
     def paginated_posts(self, obj):     # paginate users posts
         size = self.context['request'].query_params.get('size') or 5
@@ -86,33 +92,7 @@ class UserSerializer(serializers.ModelSerializer):
             posts = paginate.page(1)
         except EmptyPage:
             posts = None
-        serializer = PostWithoutCommentsSerializer(posts, many=True, context=self.context)
-        return serializer.data
-
-    def paginated_following(self, obj):     # paginate users following
-        following_size = self.context['request'].query_params.get('following_size') or 5
-        following_page = self.context['request'].query_params.get('following_page') or 1
-        paginate = Paginator(obj.following.all(), following_size)
-        try:
-            following = paginate.page(following_page)
-        except PageNotAnInteger:
-            following = paginate.page(1)
-        except EmptyPage:
-            following = None
-        serializer = UserFollowingSerializer(following, many=True)
-        return serializer.data
-
-    def paginated_followers(self, obj):     # paginate users followers
-        follower_size = self.context['request'].query_params.get('follower_size') or 5
-        follower_page = self.context['request'].query_params.get('follower_page') or 1
-        paginate = Paginator(obj.followers.all(), follower_size)
-        try:
-            followers = paginate.page(follower_page)
-        except PageNotAnInteger:
-            followers = paginate.page(1)
-        except EmptyPage:
-            followers = None
-        serializer = UserFollowingSerializer(followers, many=True)
+        serializer = PostSerializer(posts, many=True, context=self.context)
         return serializer.data
 
     def validate(self, attrs):

@@ -1,6 +1,6 @@
 from post.serializers import (
     CommentSerializer,
-    PostWithoutCommentsSerializer)
+    PostSerializer)
 from rest_framework import viewsets
 from post.models import Post, Comment
 from django.utils.text import slugify
@@ -16,7 +16,7 @@ class PostView(viewsets.ModelViewSet):
     """ 
     POST VIEW, DISPLAYS USER POSTS AND FOLLOWINGS.
     """
-    serializer_class = PostWithoutCommentsSerializer
+    serializer_class = PostSerializer
     permission_classes = [IsAuthorOrReadonly]
     lookup_fields = ['pk', 'slug']
 

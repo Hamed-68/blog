@@ -6,6 +6,9 @@ from rest_framework.viewsets import ModelViewSet
 from django.contrib.auth import get_user_model
 from account.permissions import CreateOrNeedAuthenticate
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
 
 
 class UserViewset(ModelViewSet):
@@ -27,6 +30,26 @@ class UserFollowingViewset(ModelViewSet):
     queryset = UserFollow.objects.all()
     serializer_class = UserFollowingSerializer
     permission_classes = [IsAuthenticated]
+
+    @action(detail=True, methods=['get'])
+    def following(self, request, pk):    # retrieve following 
+        following = UserFollow.objects.filter(user_id=pk)
+        page = self.paginate_queryset(following)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(following, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'])
+    def followers(self, request, pk):    # retrieve followers
+        followers = UserFollow.objects.filter(following_user_id=pk)
+        page = self.paginate_queryset(followers)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(followers, many=True)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         follower = self.request.user

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from post.models import Post, Comment, Images
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -25,6 +25,7 @@ class ImagesSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     """ POST SERIALIZER WITHOUT COMMENTS."""
     author = serializers.ReadOnlyField(source='author.username')
+    profile = serializers.ImageField(source='author.profile.photo')
     images = ImagesSerializer(many=True, read_only=True)
     uplouded_images = serializers.ListField(
         child=serializers.FileField(max_length=1000,
@@ -36,7 +37,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = [
-            'id', 'author', 'title', 'slug', 'body','images',
+            'id', 'author', 'profile', 'title', 'slug', 'body','images',
             'uplouded_images', 'created', 'updated', 'status'
         ]
         read_only_fields = ['slug']

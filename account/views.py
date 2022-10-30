@@ -5,7 +5,7 @@ from account.models import UserFollow
 from rest_framework.viewsets import ModelViewSet
 from django.contrib.auth import get_user_model
 from account.permissions import CreateOrNeedAuthenticate
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -29,7 +29,7 @@ class UserFollowingViewset(ModelViewSet):
     """USER FOLLOWING VIEW"""
     queryset = UserFollow.objects.all()
     serializer_class = UserFollowingSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     @action(detail=True, methods=['get'])
     def following(self, request, pk):    # retrieve following 

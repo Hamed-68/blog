@@ -22,8 +22,10 @@ class PostView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        posts = Post.objects.filter(
-            Q(author__followers__user_id=user.id) | Q(author=user)).distinct()
+        posts = Post.objects.all()
+        if user.is_authenticated:
+            posts = Post.objects.filter(
+                Q(author__followers__user_id=user.id) | Q(author=user)).distinct()
         return posts.filter(status='PU')
 
     def get_object(self):

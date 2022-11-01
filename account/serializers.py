@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from account.models import UserFollow, Profile
 from post.serializers import PostSerializer
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.db.models import Q
 
 
 
@@ -63,13 +64,24 @@ class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
     followers = serializers.SerializerMethodField('count_followers')
     following = serializers.SerializerMethodField('count_following')
+    # indicate request.user is in followers of this user or not.
+    status_follow = serializers.SerializerMethodField()
     post_set = serializers.SerializerMethodField('paginated_posts')
+
+    def get_status_follow(self, obj):
+        user = self.context.get('request').user
+        print(obj.followers.all())
+        print(user)
+        if user.is_authenticated:
+            return UserFollow.objects.filter(
+                Q(user_id=user) & Q(following_user_id=obj)).exists()
+        return False
 
     class Meta:
         model = get_user_model()
         fields = ['id', 'username', 'first_name', 'last_name',
-                  'email', 'profile', 'followers', 'following',
-                  'post_set','password', 'confirm_password']
+                  'email', 'profile', 'followers', 'following', 'status_follow',
+                  'post_set', 'password', 'confirm_password']
         lookup_field = 'username'
         extra_kwargs = {
             'password': {'write_only': True},

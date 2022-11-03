@@ -25,7 +25,7 @@ class ImagesSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     """ POST SERIALIZER WITHOUT COMMENTS."""
     author = serializers.ReadOnlyField(source='author.username')
-    profile = serializers.ImageField(source='author.profile.photo')
+    profile = serializers.ImageField(read_only=True, source='author.profile.photo')
     images = ImagesSerializer(many=True, read_only=True)
     uplouded_images = serializers.ListField(
         child=serializers.FileField(max_length=1000,

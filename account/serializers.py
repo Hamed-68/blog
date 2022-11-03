@@ -70,8 +70,6 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_status_follow(self, obj):
         user = self.context.get('request').user
-        print(obj.followers.all())
-        print(user)
         if user.is_authenticated:
             return UserFollow.objects.filter(
                 Q(user_id=user) & Q(following_user_id=obj)).exists()

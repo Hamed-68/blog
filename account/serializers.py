@@ -64,16 +64,20 @@ class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
     followers = serializers.SerializerMethodField('count_followers')
     following = serializers.SerializerMethodField('count_following')
-    # indicate request.user is in followers of this user or not.
+    # indicate request.user is in followers of this user.
     status_follow = serializers.SerializerMethodField()
     post_set = serializers.SerializerMethodField('paginated_posts')
 
     def get_status_follow(self, obj):
         user = self.context.get('request').user
         if user.is_authenticated:
-            return UserFollow.objects.filter(
-                Q(user_id=user) & Q(following_user_id=obj)).exists()
-        return False
+            try:
+                return UserFollow.objects.get(
+                    Q(user_id=user) & Q(following_user_id=obj)
+                ).id
+            except UserFollow.DoesNotExist:
+                return None
+        return None
 
     class Meta:
         model = get_user_model()

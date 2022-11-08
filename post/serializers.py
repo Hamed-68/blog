@@ -27,6 +27,7 @@ class PostSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
     profile = serializers.ImageField(read_only=True, source='author.profile.photo')
     images = ImagesSerializer(many=True, read_only=True)
+    image_option = serializers.CharField(write_only=True, required=False)
     uplouded_images = serializers.ListField(
         child=serializers.FileField(max_length=1000,
                                     allow_empty_file=True,
@@ -38,30 +39,33 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = [
             'id', 'author', 'profile', 'title', 'slug', 'body','images',
-            'uplouded_images', 'created', 'updated', 'status'
+            'image_option', 'uplouded_images', 'created', 'updated', 'status'
         ]
         read_only_fields = ['slug']
 
     def create(self, validated_data):
-        images = None
-        if validated_data.get('uplouded_images'):   # images are optional in post
-            images = validated_data.pop('uplouded_images')
+        uplouded_images = validated_data.pop('uplouded_images', None)
         post = Post.objects.create(**validated_data)
-        if images:
-            for img in images:  # to save multiple images
+        if uplouded_images:
+            for img in uplouded_images:  # to save multiple images
                 Images.objects.create(post=post, image=img)
         return post
 
     def update(self, instance, validated_data):
-        images = None
-        if validated_data.get('uplouded_images'):
-            images = validated_data.pop('uplouded_images')
+        uplouded_images = validated_data.pop('uplouded_images', None) # new images
+        image_option = validated_data.pop('image_option', None) # deleted images
         instance.title = validated_data.get('title', instance.title)
         instance.body = validated_data.get('body', instance.body)
         instance.status = validated_data.get('status', instance.status)
         instance.save()
-        if images:
-            instance.images.all().delete()  # delete old images
-            for img in images:
+        if uplouded_images: # add new images (optional)
+            for img in uplouded_images:
                 Images.objects.create(post=instance, image=img)
+        if image_option:  # delete old images (optional)
+            ids = image_option.strip('[]').split(', ')
+            for id in ids:
+                try:
+                    Images.objects.get(id=id).delete()
+                except Images.DoesNotExist:
+                    pass
         return instance

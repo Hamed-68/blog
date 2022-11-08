@@ -62,7 +62,7 @@ class PostSerializer(serializers.ModelSerializer):
             for img in uplouded_images:
                 Images.objects.create(post=instance, image=img)
         if image_option:  # delete old images (optional)
-            ids = image_option.strip('[]').split(', ')
+            ids = image_option.strip('[]').split(',')
             for id in ids:
                 try:
                     Images.objects.get(id=id).delete()

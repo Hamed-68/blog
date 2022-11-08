@@ -48,12 +48,12 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class RawUserSerializer(serializers.ModelSerializer):
     """ USER SERIALIZER WITHOUT NESTED SERIALIZERS. """
-    profile = ProfileSerializer()
+    profile_photo = serializers.ImageField(source='profile.photo')
 
     class Meta:
         model = get_user_model()
         fields = ['id', 'username', 'first_name',
-                  'last_name', 'email', 'profile']
+                  'last_name', 'email', 'profile_photo']
         lookup_field = 'username'
 
 
@@ -61,7 +61,7 @@ class RawUserSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     """USER SERIALIZER"""
     confirm_password = serializers.CharField(write_only=True)
-    profile = ProfileSerializer()
+    profile_photo = serializers.ImageField(source='profile.photo')
     followers = serializers.SerializerMethodField('count_followers')
     following = serializers.SerializerMethodField('count_following')
     # indicate request.user is in followers of this user.
@@ -82,7 +82,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['id', 'username', 'first_name', 'last_name',
-                  'email', 'profile', 'followers', 'following', 'status_follow',
+                  'email', 'profile_photo', 'followers', 'following', 'status_follow',
                   'post_set', 'password', 'confirm_password']
         lookup_field = 'username'
         extra_kwargs = {

@@ -7,6 +7,7 @@ router = routers.DefaultRouter()
 router.register(r'post', views.PostView, basename='post')
 router.register(r'explore', views.ExplorePost, basename='explore')
 router.register(r'comment', views.CommentView, basename='comment')
+router.register(r'like', views.PostLikeView, basename='like')
 
 
 urlpatterns = [

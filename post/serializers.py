@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from post.models import Post, Comment, Images
+from post.models import Post, Comment, Images, PostLike
+from django.db.models import Q
 
 
 
@@ -26,6 +27,9 @@ class PostSerializer(serializers.ModelSerializer):
     """ POST SERIALIZER WITHOUT COMMENTS."""
     author = serializers.ReadOnlyField(source='author.username')
     profile = serializers.ImageField(read_only=True, source='author.profile.photo')
+    like = serializers.IntegerField(source='get_likes') # count likes
+    # indicate current user liked this post
+    status_like = serializers.SerializerMethodField()
     images = ImagesSerializer(many=True, read_only=True)
     image_option = serializers.CharField(write_only=True, required=False)
     uplouded_images = serializers.ListField(
@@ -35,11 +39,23 @@ class PostSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
+
+    def get_status_like(self, obj):
+        user = self.context.get('request').user
+        if user.is_authenticated:
+            try:
+                return PostLike.objects.get(
+                    Q(user=user) & Q (post=obj)).id
+            except PostLike.DoesNotExist:
+                return None
+        return None
+
     class Meta:
         model = Post
         fields = [
-            'id', 'author', 'profile', 'title', 'slug', 'body','images',
-            'image_option', 'uplouded_images', 'created', 'updated', 'status'
+            'id', 'author', 'profile', 'title', 'slug', 'body',
+            'like', 'status_like', 'images', 'image_option',
+            'uplouded_images', 'created', 'updated', 'status'
         ]
         read_only_fields = ['slug']
 
@@ -69,3 +85,20 @@ class PostSerializer(serializers.ModelSerializer):
                 except Images.DoesNotExist:
                     pass
         return instance
+
+
+
+class PostLikeSerializer(serializers.ModelSerializer):
+    """ POST LIKE SERIALIZER """
+    user = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = PostLike
+        fields = '__all__'
+        read_only = ['user']
+
+    def create(self, validated_data):
+        post = validated_data.get('post', None)
+        user = self.context.get('request').user
+        like, created = PostLike.objects.get_or_create(user=user, post=post)
+        return like

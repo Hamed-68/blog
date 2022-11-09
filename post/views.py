@@ -1,10 +1,13 @@
 from post.serializers import (
     CommentSerializer,
-    PostSerializer)
+    PostSerializer,
+    PostLikeSerializer)
 from rest_framework import viewsets
-from post.models import Post, Comment
+from post.models import Post, Comment, PostLike
 from django.utils.text import slugify
-from post.permissions import IsAuthorOrReadonly, IsOwnerOrAuthorPost
+from post.permissions import (IsAuthorOrReadonly,
+                              IsOwnerOrAuthorPost,
+                              IsLikerOrReadonly)
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from rest_framework.decorators import action
@@ -77,3 +80,11 @@ class CommentView(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+
+class PostLikeView(viewsets.ModelViewSet):
+    """ POST LIKE VIEW """
+    serializer_class = PostLikeSerializer
+    queryset = PostLike.objects.all()
+    permission_classes = [IsLikerOrReadonly]

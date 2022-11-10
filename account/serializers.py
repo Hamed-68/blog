@@ -48,13 +48,21 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class RawUserSerializer(serializers.ModelSerializer):
     """ USER SERIALIZER WITHOUT NESTED SERIALIZERS. """
-    profile_photo = serializers.ImageField(source='profile.photo')
+    profile_photo = serializers.ImageField(source='profile.photo', required=False)
 
     class Meta:
         model = get_user_model()
         fields = ['id', 'username', 'first_name',
                   'last_name', 'email', 'profile_photo']
         lookup_field = 'username'
+
+    def update(self, instance, validated_data):
+        profile = validated_data.pop('profile', None)
+        if profile:  # change profile photo
+            instance.profile.delete()
+            Profile.objects.create(user=instance, photo=profile['photo'])
+        instance.save()
+        return super(RawUserSerializer, self).update(instance, validated_data)
 
 
 
@@ -124,14 +132,3 @@ class UserSerializer(serializers.ModelSerializer):
         else:
             Profile.objects.create(user=user, photo=None)
         return user
-
-    def update(self, instance, validated_data):
-        profile = validated_data.pop('profile', None)
-        if 'password' in validated_data:
-            password = validated_data.pop('password')
-            instance.set_password(password)
-        if profile:  # change profile photo
-            instance.profile.delete()
-            Profile.objects.create(user=instance, photo=profile['photo'])
-        instance.save()
-        return super(UserSerializer, self).update(instance, validated_data)

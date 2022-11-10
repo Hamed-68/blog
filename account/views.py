@@ -18,8 +18,10 @@ class UserViewset(ModelViewSet):
     permission_classes = [CreateOrNeedAuthenticate]
     lookup_field = 'username'
 
-    def get_serializer_class(self):  # users list without extra info
-        if hasattr(self, 'action') and self.action == 'list':
+    def get_serializer_class(self):  
+        # use different serializer for list and update action
+        if hasattr(self, 'action') and (
+            self.action == 'list' or self.action == 'update'):
             return RawUserSerializer
         return self.serializer_class
 

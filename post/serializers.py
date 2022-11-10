@@ -27,7 +27,7 @@ class PostSerializer(serializers.ModelSerializer):
     """ POST SERIALIZER WITHOUT COMMENTS."""
     author = serializers.ReadOnlyField(source='author.username')
     profile = serializers.ImageField(read_only=True, source='author.profile.photo')
-    like = serializers.IntegerField(source='get_likes') # count likes
+    like = serializers.IntegerField(source='get_likes', read_only=True) # count likes
     # indicate current user liked this post
     status_like = serializers.SerializerMethodField()
     images = ImagesSerializer(many=True, read_only=True)
@@ -47,8 +47,8 @@ class PostSerializer(serializers.ModelSerializer):
                 return PostLike.objects.get(
                     Q(user=user) & Q (post=obj)).id
             except PostLike.DoesNotExist:
-                return None
-        return None
+                return 0
+        return 0
 
     class Meta:
         model = Post

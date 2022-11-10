@@ -61,7 +61,7 @@ class RawUserSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     """USER SERIALIZER"""
     confirm_password = serializers.CharField(write_only=True)
-    profile_photo = serializers.ImageField(source='profile.photo')
+    profile_photo = serializers.ImageField(source='profile.photo', required=False)
     followers = serializers.SerializerMethodField('count_followers')
     following = serializers.SerializerMethodField('count_following')
     # indicate request.user is in followers of this user.
@@ -117,20 +117,20 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('confirm_password')
-        profile = validated_data.pop('profile')
+        profile = validated_data.pop('profile', None)
         user = get_user_model().objects.create_user(**validated_data)
-        if profile['photo']:  # add profile photo
+        if profile:  # add profile photo
             Profile.objects.create(user=user, photo=profile['photo'])
         else:
             Profile.objects.create(user=user, photo=None)
         return user
 
     def update(self, instance, validated_data):
-        profile = validated_data.pop('profile')
+        profile = validated_data.pop('profile', None)
         if 'password' in validated_data:
             password = validated_data.pop('password')
             instance.set_password(password)
-        if profile['photo']:  # change profile photo
+        if profile:  # change profile photo
             instance.profile.delete()
             Profile.objects.create(user=instance, photo=profile['photo'])
         instance.save()

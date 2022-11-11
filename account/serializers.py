@@ -49,18 +49,23 @@ class ProfileSerializer(serializers.ModelSerializer):
 class RawUserSerializer(serializers.ModelSerializer):
     """ USER SERIALIZER WITHOUT NESTED SERIALIZERS. """
     profile_photo = serializers.ImageField(source='profile.photo', required=False)
+    remove_profile_photo = serializers.BooleanField(
+        required=False, write_only=True)
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'first_name',
-                  'last_name', 'email', 'profile_photo']
+        fields = ['id', 'username', 'first_name', 'last_name',
+                  'email', 'profile_photo', 'remove_profile_photo']
         lookup_field = 'username'
 
     def update(self, instance, validated_data):
         profile = validated_data.pop('profile', None)
+        remove_profile_photo = validated_data.pop('remove_profile_photo', None)
         if profile:  # change profile photo
             instance.profile.delete()
             Profile.objects.create(user=instance, photo=profile['photo'])
+        elif remove_profile_photo: # remove profile photo
+            instance.profile.photo.delete()
         instance.save()
         return super(RawUserSerializer, self).update(instance, validated_data)
 

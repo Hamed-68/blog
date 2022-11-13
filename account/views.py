@@ -8,6 +8,9 @@ from account.permissions import CreateOrNeedAuthenticate
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+from rest_framework import status
+from django.contrib.auth import authenticate, login
 
 
 
@@ -24,6 +27,18 @@ class UserViewset(ModelViewSet):
             self.action == 'list' or self.action == 'update'):
             return RawUserSerializer
         return self.serializer_class
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        user = authenticate(username=serializer.data['username'],
+                            password=request.data['password'])
+        login(request, user) # stay login after register
+        token = Token.objects.get(user=user)
+        return Response({'token': token.key},
+            status=status.HTTP_201_CREATED, headers=headers)
 
 
 
